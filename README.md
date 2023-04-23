@@ -1,2 +1,5 @@
 # notware
-its uzbekistan, best services
+this is example: from **uzbekistan!**
+```js
+console.log('one')
+```
