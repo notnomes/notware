@@ -1,8 +1,17 @@
-const chalk = require('chalk')
-const express = require('express')
-const app = express()
-app.listen(4000, () => {
+const chalk = require('chalk');
+const express = require('express');
+require('dotenv').config();
+const {send, client} = require('./discord/main');
+const app = express();
+app.listen(4000, async () => {
     console.clear();
-    chalk.bgMagenta('Server working')
-    runbot()
-})
+    client.login(process.env.TOKEN)
+    await send('I am here :smile:');
+    setTimeout(async () => {
+        await send(`Time is ${Date.now}`)
+        eval('console.log("one")')
+    }, 1000);
+    await send('i love nigers :skull:').then(async() => {
+        await send('i mean snigers :smile:')
+    })
+});
