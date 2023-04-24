@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express.Router();
 const User = require('../models/UserModel')
+const mongoose = require('mongoose')
 
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
