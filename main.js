@@ -4,7 +4,7 @@ require('dotenv').config();
 const {send, client} = require('./discord/main');
 const app = express();
 const session = require('express-session');
-const login = require('./routes/login')
+const login = require('./routes/main')
 app.use('/', login)
 app.listen(4000, async () => {
     console.clear();

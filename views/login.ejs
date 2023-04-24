@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+    <% if (typeof error !== 'undefined') { %>
+        <p><%= error %></p>
+    <% } %>
+    
+    <form method="post" action="/login">
+        <div>
+            <label for="name">name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div>
+            <button type="submit">Login</button>
+        </div>
+    </form>
+    <p>Don't have an account? <a href="/register">Register here</a></p>
+</body>
+</html>
