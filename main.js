@@ -3,8 +3,12 @@ const express = require('express');
 require('dotenv').config();
 const {send, client} = require('./discord/main');
 const app = express();
+const bodyParser = require('body-parser');
+const db = require('./database/db')
+db.then(console.log(chalk.bgMagenta('Database +')))
 const session = require('express-session');
 const login = require('./routes/main')
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/', login)
 app.listen(4000, async () => {
     console.clear();

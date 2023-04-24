@@ -1,38 +1,34 @@
-const express = require('express');
-const app = express.Router();
-const User = require('../models/UserModel')
-const mongoose = require('mongoose')
+const router = require('express').Router();
+const User = require('../models/UserModel');
+const bcrypt = require('bcryptjs');
+const bodyParser = require('body-parser');
+router.use(bodyParser.urlencoded({ extended: true }));
 
-app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
 
-    // Find user in database
-    const user = await User.findOne({ email });
-
-    // If user not found, redirect to login page with error message
-    if (!user) {
-        return res.render('login', { error: 'Invalid email or password' });
-    }
-
-    // Compare password with hashed password in database
-    const passwordMatch = await bcrypt.compare(password, user.password);
-
-    // If passwords don't match, redirect to login page with error message
+// Login form submission
+router.post('/login', async (req, res) => {
+    const { name, password } = req.body;
+  
+    // Find user in database and compare passwords
+    const user = await User.findOne({ name });
+    const passwordMatch = password && user.password && await bcrypt.compare(password, user.password);
+    
+    // If user not found or passwords don't match, show error message
     if (!passwordMatch) {
-        return res.render('login', { error: 'Invalid email or password' });
+      return res.render('login.ejs', { error: 'Invalid name or password' });
     }
-
-    // Store user ID in session
+  
+    // Store user ID in session and redirect to dashboard
     req.session.userId = user._id;
-
-    // Redirect to dashboard
     res.redirect('/dashboard');
-});
+  });
+
 
 // Dashboard page
-app.get('/dashboard', async (req, res) => {
-    // Get user ID from session
+router.get('/dashboard', async (req, res) => {
+    // Get user ID and role from session
     const userId = req.session.userId;
+    const userRole = req.session.role;
 
     // If user ID not found, redirect to login page
     if (!userId) {
@@ -47,29 +43,40 @@ app.get('/dashboard', async (req, res) => {
         return res.redirect('/login');
     }
 
-    // Render dashboard page with user data
-    res.render('dashboard', { user });
+    // Render dashboard page with user data and role
+    if (userRole === 'admin') {
+        res.render('admin.ejs', { user });
+    } else {
+        res.render('dash.ejs', { user });
+    }
 });
 
 // Registration form submission
-app.post('/register', async (req, res) => {
-    const { email, password } = req.body;
+router.post('/register', async (req, res) => {
+    const { name, password } = req.body;
 
     // Hash password with bcrypt
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create user in database
-    await User.create({
-        email,
+    const user = new User({
+        name,
         password: hashedPassword
     });
+    user.save();
 
     // Redirect to login page
     res.redirect('/login');
 });
 
-app.get('/login', (res, req) => {
-    req.render('login.ejs')
-})
+// Login page
+router.get('/login', (req, res) => {
+    res.render('login.ejs');
+});
 
-module.exports = app
+// Registration page
+router.get('/register', (req, res) => {
+    res.render('register.ejs');
+});
+
+module.exports = router;
